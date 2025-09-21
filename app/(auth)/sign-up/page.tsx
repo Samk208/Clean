@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
 import { z } from "zod"
 import type { Icon } from "@/lib/types"
+import { supabase } from "@/lib/supabase/client"
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -150,8 +151,22 @@ export default function SignUpPage() {
         description: "Welcome to One-Link! Let's set up your profile.",
       })
 
+      // Ensure a real session exists: sign in client-side
+      try {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        })
+        if (signInErr) {
+          // Non-fatal: user can still be redirected but onboarding will require sign-in
+          console.warn("Client sign-in after sign-up failed:", signInErr)
+        }
+      } catch (e) {
+        console.warn("Client sign-in threw:", e)
+      }
+
       // Enhanced routing: Direct to advanced onboarding for suppliers and influencers
-      const redirectPath = 
+      const redirectPath =
         result.role === "supplier" || result.role === "influencer"
           ? `/auth/onboarding?role=${result.role === "supplier" ? "brand" : "influencer"}`
           : "/shop"
@@ -164,12 +179,28 @@ export default function SignUpPage() {
     }
   }
 
-  const handleSocialSignUp = (provider: "google" | "apple") => {
-    console.log("[v0] Social sign up attempt:", provider)
-    toast({
-      title: "Coming Soon",
-      description: `${provider === "google" ? "Google" : "Apple"} sign-up will be available soon.`,
-    })
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/api/auth/callback` }
+      })
+      if (error) throw error
+    } catch (e) {
+      toast({ title: "Google sign-up failed", description: String(e), variant: "destructive" })
+    }
+  }
+
+  const handleKakaoSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "kakao",
+        options: { redirectTo: `${window.location.origin}/api/auth/callback` }
+      })
+      if (error) throw error
+    } catch (e) {
+      toast({ title: "Kakao sign-up failed", description: String(e), variant: "destructive" })
+    }
   }
 
   return (
@@ -208,7 +239,7 @@ export default function SignUpPage() {
                 type="button"
                 variant="outline"
                 className="h-11 text-sm font-medium bg-transparent"
-                onClick={() => handleSocialSignUp("google")}
+                onClick={handleGoogleSignUp}
                 aria-label="Sign up with Google"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
@@ -234,14 +265,14 @@ export default function SignUpPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="h-11 text-sm font-medium bg-transparent"
-                onClick={() => handleSocialSignUp("apple")}
-                aria-label="Sign up with Apple"
+                className="h-11 text-sm font-medium bg-yellow-300 hover:bg-yellow-400 text-gray-900"
+                onClick={handleKakaoSignUp}
+                aria-label="Sign up with Kakao"
               >
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
                 </svg>
-                Apple
+                Kakao
               </Button>
             </div>
 

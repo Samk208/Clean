@@ -67,11 +67,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: existingUser, error: existingUserError } = await getUserByEmail(email)
 
     if (existingUserError) {
-      console.error('Error checking existing user:', existingUserError)
-      return NextResponse.json(
-        createAuthErrorResponse("Something went wrong. Please try again."),
-        { status: 500 }
-      )
+      // Do not fail sign-up just because the existence check failed.
+      // Log and continue - duplicate will be caught by createUser below.
+      console.warn('User existence check failed; proceeding to create user anyway:', existingUserError)
     }
 
     if (existingUser) {
@@ -96,9 +94,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (authError) {
       console.error('Supabase admin auth error:', authError)
+      const message = authError.message || 'Unable to create account'
+      const isDuplicate = message.toLowerCase().includes('already') || message.toLowerCase().includes('registered')
+      const status = isDuplicate ? 409 : 400
       return NextResponse.json(
-        createAuthErrorResponse(`Unable to create account: ${authError.message}`),
-        { status: 400 }
+        {
+          ...createAuthErrorResponse(`Unable to create account: ${message}`),
+          ...(process.env.NODE_ENV === 'development' ? { debug: { code: (authError as any).code, details: (authError as any).error_description || (authError as any).message } } : {}),
+        },
+        { status }
       )
     }
 
@@ -124,14 +128,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     console.log('User profile created successfully')
+
+    // Immediately sign the user in to create a session cookie
+    try {
+      const supabase = createServerSupabaseClient(request)
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      if (signInError) {
+        console.warn('Sign-in after sign-up failed; user must sign in manually:', signInError)
+      } else {
+        console.log('User signed in and session established after sign-up')
+      }
+    } catch (e) {
+      console.warn('Failed to establish session after sign-up:', e)
+    }
+
     return NextResponse.json(
-      createAuthSuccessResponse(user, "Account created successfully! You can now sign in.")
+      createAuthSuccessResponse(user, "Account created successfully! ")
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error('Unexpected sign-up error:', error)
-    return NextResponse.json(
-      createAuthErrorResponse("Something went wrong. Please try again."),
-      { status: 500 }
-    )
+    const body: any = createAuthErrorResponse("Something went wrong. Please try again.")
+    if (process.env.NODE_ENV === 'development') {
+      body.debug = { message: String(error?.message || error) }
+    }
+    return NextResponse.json(body, { status: 500 })
   }
 }

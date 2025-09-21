@@ -67,9 +67,10 @@ export async function createUserProfile(
     } as any
     
     // Use supabaseAdmin to bypass RLS for user creation
+    // Upsert to avoid conflicts with the on_auth_user_created trigger
     const { data: user, error } = await supabaseAdmin
       .from('profiles')
-      .insert(insertData as any)
+      .upsert(insertData as any, { onConflict: 'id' })
       .select()
       .single()
 
@@ -177,36 +178,49 @@ export function requiresVerification(role: UserRole): boolean {
 // Get user by email
 export async function getUserByEmail(email: string): Promise<{ data: User | null; error?: any }> {
   try {
-    // Use proper type inference with QueryData pattern
-    // profiles does not store email; perform a best-effort fetch by joining via a helper view if available
-    // For now, attempt to find a profile by id using auth admin if you've mapped emails elsewhere.
-    // Returning null if not found.
-    const query = supabaseAdmin
+    // Look up real existence in auth.users via Admin API
+    // Note: Supabase JS Admin API doesn't expose getUserByEmail in all versions, so we list and filter.
+    // This is acceptable for low volume sign-ups; for high volume, implement a server-side RPC.
+    const perPage = 200
+    let page = 1
+    let foundUser: any | null = null
+    // Normalize email case for comparison
+    const target = email.trim().toLowerCase()
+
+    // Paginate until we find the user or exhaust
+    while (true) {
+      const { data: pageData, error: listErr } = await supabaseAdmin.auth.admin.listUsers({ page, perPage })
+      if (listErr) return { data: null, error: listErr }
+      const users = pageData?.users || []
+      const match = users.find((u: any) => (u.email || '').trim().toLowerCase() === target)
+      if (match) {
+        foundUser = match
+        break
+      }
+      if (!users.length) break
+      page += 1
+      // Safety cap for pagination
+      if (page > 25) break
+    }
+
+    if (!foundUser) return { data: null, error: null }
+
+    // Fetch profile to build a complete User object if present
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('*')
-      .limit(1)
+      .eq('id', foundUser.id)
       .maybeSingle()
-    
-    const { data: user, error } = await query
 
-    if (error && (error as any).code !== 'PGRST116') { // PGRST116 is "not found" error
-      return { data: null, error }
-    }
-
-    if (!user) {
-      return { data: null, error: null }
-    }
-
-    // Transform to User type
     const transformedUser: User = {
-      id: user.id,
-      email: email,
-      name: (user as any).name ?? '',
-      role: (user as any).role as UserRole,
-      avatar: (user as any).avatar || undefined,
-      verified: (user as any).verified || false,
-      createdAt: user.created_at ?? new Date().toISOString(),
-      updatedAt: user.updated_at ?? new Date().toISOString()
+      id: foundUser.id,
+      email: foundUser.email ?? email,
+      name: (profile as any)?.name ?? '',
+      role: ((profile as any)?.role ?? 'customer') as UserRole,
+      avatar: (profile as any)?.avatar || undefined,
+      verified: (profile as any)?.verified || false,
+      createdAt: (profile as any)?.created_at ?? new Date().toISOString(),
+      updatedAt: (profile as any)?.updated_at ?? new Date().toISOString()
     }
 
     return { data: transformedUser, error: null }

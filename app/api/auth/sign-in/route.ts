@@ -69,21 +69,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const { data: user, error: userError } = await supabase
-      .from('user_admin_view')
-      .select('id, email, name, role, verified, created_at, updated_at')
+    // Fetch minimal profile fields from public.profiles (accessible to authenticated users via RLS)
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, name, role, verified, created_at, updated_at')
       .eq('id', authUser.id)
       .maybeSingle()
 
-    if (userError) {
-      console.error('User profile lookup error:', userError)
+    if (profileError) {
+      console.error('User profile lookup error:', profileError)
       return NextResponse.json(
         createAuthErrorResponse('User profile not found. Please contact support.'),
         { status: 404 }
       )
     }
 
-    if (!user) {
+    if (!profile) {
       console.error('No user profile found for email:', email)
       return NextResponse.json(
         createAuthErrorResponse('User profile not found. Please contact support.'),
@@ -91,8 +92,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    console.log('Sign-in successful for user:', (user as any).id)
-    return NextResponse.json(createAuthSuccessResponse(user))
+    const responseUser = {
+      ...(profile as any),
+      email: authUser.email ?? email,
+    }
+
+    console.log('Sign-in successful for user:', (responseUser as any).id)
+    return NextResponse.json(createAuthSuccessResponse(responseUser as any))
   } catch (error) {
     console.error('Unexpected sign-in error:', error)
     return NextResponse.json(
@@ -101,3 +107,4 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     )
   }
 }
+

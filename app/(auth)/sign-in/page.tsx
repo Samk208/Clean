@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "@/hooks/use-toast"
 import { UserRole, type AuthResponse } from "@/lib/types"
+import { supabase } from "@/lib/supabase/client"
 
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -113,12 +114,28 @@ export default function SignInPage() {
     }
   }
 
-  const handleSocialLogin = (provider: "google" | "apple") => {
-    console.log("[v0] Social login attempt:", provider)
-    toast({
-      title: "Coming Soon",
-      description: `${provider === "google" ? "Google" : "Apple"} sign-in will be available soon.`,
-    })
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/api/auth/callback` }
+      })
+      if (error) throw error
+    } catch (e) {
+      toast({ title: "Google sign-in failed", description: String(e), variant: "destructive" })
+    }
+  }
+
+  const handleKakaoSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "kakao",
+        options: { redirectTo: `${window.location.origin}/api/auth/callback` }
+      })
+      if (error) throw error
+    } catch (e) {
+      toast({ title: "Kakao sign-in failed", description: String(e), variant: "destructive" })
+    }
   }
 
   return (
@@ -152,7 +169,7 @@ export default function SignInPage() {
                 type="button"
                 variant="outline"
                 className="w-full h-11 text-sm font-medium bg-transparent"
-                onClick={() => handleSocialLogin("google")}
+                onClick={handleGoogleSignIn}
                 aria-label="Sign in with Google"
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
@@ -178,14 +195,15 @@ export default function SignInPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-11 text-sm font-medium bg-transparent"
-                onClick={() => handleSocialLogin("apple")}
-                aria-label="Sign in with Apple"
+                className="w-full h-11 text-sm font-medium bg-yellow-300 hover:bg-yellow-400 text-gray-900"
+                onClick={handleKakaoSignIn}
+                aria-label="Sign in with Kakao"
               >
-                <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                {/* Simple Kakao glyph replacement */}
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
                 </svg>
-                Continue with Apple
+                Continue with Kakao
               </Button>
             </div>
 

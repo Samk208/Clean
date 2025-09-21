@@ -93,22 +93,24 @@ export default function InfluencerKYCStep({ data, updateData, onNext, onPrev }: 
     },
   })
 
-  const simulateUpload = useCallback((setState: React.Dispatch<React.SetStateAction<FileUploadState>>) => {
-    setState((prev) => ({ ...prev, status: "uploading", progress: 0 }))
-
+  // Simulate progress while awaiting the network upload
+  const startSimulatedProgress = (setState: React.Dispatch<React.SetStateAction<FileUploadState>>) => {
+    setState((prev) => ({ ...prev, status: "uploading", progress: 5 }))
     const interval = setInterval(() => {
       setState((prev) => {
-        if (prev.progress >= 100) {
+        if (prev.status !== "uploading") {
           clearInterval(interval)
-          return { ...prev, status: "success", progress: 100 }
+          return prev
         }
-        return { ...prev, progress: prev.progress + 10 }
+        const next = Math.min(prev.progress + 7, 95)
+        return { ...prev, progress: next }
       })
-    }, 200)
-  }, [])
+    }, 180)
+    return () => clearInterval(interval)
+  }
 
   const handleFileUpload = useCallback(
-    (
+    async (
       file: File,
       type: "id" | "selfie" | "address" | "bank",
       setState: React.Dispatch<React.SetStateAction<FileUploadState>>,
@@ -122,28 +124,67 @@ export default function InfluencerKYCStep({ data, updateData, onNext, onPrev }: 
         return
       }
 
+      const allowed = [/^image\//, /^application\/pdf$/]
+      if (!allowed.some((r) => r.test(file.type))) {
+        toast({ title: "Invalid file type", description: "Only images and PDFs are allowed", variant: "destructive" })
+        return
+      }
+
+      // For preview
       const reader = new FileReader()
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const preview = e.target?.result as string
-        setState({ file, preview, status: "idle", progress: 0 })
+        setState({ file, preview, status: "uploading", progress: 0 })
+        const stop = startSimulatedProgress(setState)
 
-        // Update parent data
-        const updateKey =
+        // Map UI type to server documentType
+        const documentType =
           type === "id"
-            ? "idDocument"
+            ? "government_id"
             : type === "selfie"
-              ? "selfiePhoto"
+              ? "selfie_verification"
               : type === "address"
-                ? "proofOfAddress"
-                : "bankStatement"
-        updateData({ [updateKey]: file })
+                ? "proof_of_address"
+                : "bank_statement"
 
-        // Simulate upload
-        simulateUpload(setState)
+        try {
+          const form = new FormData()
+          form.set("file", file)
+          form.set("documentType", documentType)
+
+          const res = await fetch("/api/onboarding/docs", {
+            method: "POST",
+            body: form,
+          })
+
+          const json = await res.json().catch(() => null)
+          if (!res.ok || !json?.ok) {
+            throw new Error(json?.error || "Upload failed")
+          }
+
+          stop()
+          setState((prev) => ({ ...prev, status: "success", progress: 100 }))
+
+          // Update parent with the uploaded file meta to guard navigation
+          const updateKey =
+            type === "id"
+              ? "idDocument"
+              : type === "selfie"
+                ? "selfiePhoto"
+                : type === "address"
+                  ? "proofOfAddress"
+                  : "bankStatement"
+          updateData({ [updateKey]: file })
+
+          toast({ title: "Uploaded", description: `${file.name} uploaded successfully` })
+        } catch (err: any) {
+          setState((prev) => ({ ...prev, status: "error", progress: 0, error: err?.message || "Upload error" }))
+          toast({ title: "Upload failed", description: String(err?.message || err), variant: "destructive" })
+        }
       }
       reader.readAsDataURL(file)
     },
-    [updateData, simulateUpload],
+    [updateData],
   )
 
   const removeFile = (
