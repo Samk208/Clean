@@ -103,6 +103,7 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [duplicateEmail, setDuplicateEmail] = useState<string | null>(null)
   const router = useRouter()
 
   const form = useForm<SignUpForm>({
@@ -122,6 +123,7 @@ export default function SignUpPage() {
   const onSubmit = async (data: SignUpForm) => {
     setIsLoading(true)
     setError("")
+    setDuplicateEmail(null)
 
     try {
       const response = await fetch("/api/auth/sign-up", {
@@ -134,7 +136,16 @@ export default function SignUpPage() {
 
       const result = await response.json()
 
-      if (!result.ok) {
+      // Handle HTTP-level errors first for specific UX, then payload-level
+      if (!response.ok || !result.ok) {
+        if (response.status === 409) {
+          const msg = result?.error || "An account with this email already exists."
+          setError(msg)
+          setDuplicateEmail(data.email)
+          // Mark the email field specifically
+          form.setError("email", { message: "This email is already registered. You can sign in or reset your password." })
+          return
+        }
         if (result.fieldErrors) {
           Object.entries(result.fieldErrors).forEach(([field, message]) => {
             if (message) {
@@ -696,6 +707,29 @@ export default function SignUpPage() {
                 </Link>
               </p>
             </div>
+
+            {/* Duplicate account helper actions */}
+            {duplicateEmail && (
+              <div className="mt-4 rounded-lg border bg-yellow-50 border-yellow-200 p-4">
+                <p className="text-sm text-yellow-900 mb-3">
+                  An account with <span className="font-medium">{duplicateEmail}</span> already exists.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Link
+                    href={`/sign-in?email=${encodeURIComponent(duplicateEmail)}`}
+                    className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm hover:bg-indigo-700"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href={`/reset?email=${encodeURIComponent(duplicateEmail)}`}
+                    className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm bg-white hover:bg-gray-50"
+                  >
+                    Reset password
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Terms */}
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">

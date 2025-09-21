@@ -1,0 +1,173 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\playwright.config.ts",
+    "rootDir": "C:/Users/Lenovo/Desktop/Workspce/vo-onelink-google/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\setup\\global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Lenovo/Desktop/Workspce/vo-onelink-google/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/Lenovo/Desktop/Workspce/vo-onelink-google/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 8,
+    "webServer": {
+      "command": "pnpm dev --port 3001",
+      "url": "http://127.0.0.1:3001",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "e2e\\onboarding-influencer.spec.ts",
+      "file": "e2e/onboarding-influencer.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Influencer Onboarding - Document Uploads",
+          "file": "e2e/onboarding-influencer.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "can sign up, reach Identity Verification, and upload required documents",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1892,
+                      "error": {
+                        "message": "Error: locator.click: Error: strict mode violation: getByRole('radio', { name: 'Influencer' }) resolved to 3 elements:\n    1) <button role=\"radio\" type=\"button\" id=\"supplier\" tabindex=\"-1\" value=\"supplier\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Supplier Business I want to' })\n    2) <button role=\"radio\" type=\"button\" tabindex=\"-1\" id=\"influencer\" value=\"influencer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visi…></button> aka getByRole('radio', { name: 'Influencer Creator I want to' })\n    3) <button role=\"radio\" type=\"button\" id=\"customer\" tabindex=\"-1\" value=\"customer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Customer Shopper I want to' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('radio', { name: 'Influencer' })\u001b[22m\n",
+                        "stack": "Error: locator.click: Error: strict mode violation: getByRole('radio', { name: 'Influencer' }) resolved to 3 elements:\n    1) <button role=\"radio\" type=\"button\" id=\"supplier\" tabindex=\"-1\" value=\"supplier\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Supplier Business I want to' })\n    2) <button role=\"radio\" type=\"button\" tabindex=\"-1\" id=\"influencer\" value=\"influencer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visi…></button> aka getByRole('radio', { name: 'Influencer Creator I want to' })\n    3) <button role=\"radio\" type=\"button\" id=\"customer\" tabindex=\"-1\" value=\"customer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Customer Shopper I want to' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('radio', { name: 'Influencer' })\u001b[22m\n\n    at C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\e2e\\onboarding-influencer.spec.ts:24:59",
+                        "location": {
+                          "file": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\e2e\\onboarding-influencer.spec.ts",
+                          "column": 59,
+                          "line": 24
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Create your account'\u001b[39m })\u001b[33m.\u001b[39mwaitFor()\n \u001b[90m 23 |\u001b[39m     \u001b[90m// Choose role: Influencer — target the radio directly to avoid strict-mode ambiguity\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'radio'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Influencer'\u001b[39m })\u001b[33m.\u001b[39mclick()\n \u001b[90m    |\u001b[39m                                                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m\n \u001b[90m 26 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\n \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'First name'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'E2E'\u001b[39m)\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\e2e\\onboarding-influencer.spec.ts",
+                            "column": 59,
+                            "line": 24
+                          },
+                          "message": "Error: locator.click: Error: strict mode violation: getByRole('radio', { name: 'Influencer' }) resolved to 3 elements:\n    1) <button role=\"radio\" type=\"button\" id=\"supplier\" tabindex=\"-1\" value=\"supplier\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Supplier Business I want to' })\n    2) <button role=\"radio\" type=\"button\" tabindex=\"-1\" id=\"influencer\" value=\"influencer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visi…></button> aka getByRole('radio', { name: 'Influencer Creator I want to' })\n    3) <button role=\"radio\" type=\"button\" id=\"customer\" tabindex=\"-1\" value=\"customer\" aria-checked=\"false\" data-state=\"unchecked\" data-slot=\"radio-group-item\" data-radix-collection-item=\"\" class=\"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:…></button> aka getByRole('radio', { name: 'Customer Shopper I want to' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('radio', { name: 'Influencer' })\u001b[22m\n\n\n\u001b[0m \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Create your account'\u001b[39m })\u001b[33m.\u001b[39mwaitFor()\n \u001b[90m 23 |\u001b[39m     \u001b[90m// Choose role: Influencer — target the radio directly to avoid strict-mode ambiguity\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'radio'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Influencer'\u001b[39m })\u001b[33m.\u001b[39mclick()\n \u001b[90m    |\u001b[39m                                                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m\n \u001b[90m 26 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\n \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'First name'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'E2E'\u001b[39m)\u001b[0m\n\u001b[2m    at C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\e2e\\onboarding-influencer.spec.ts:24:59\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-21T10:36:27.846Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\test-results\\e2e-onboarding-influencer--64a14-d-upload-required-documents-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\test-results\\e2e-onboarding-influencer--64a14-d-upload-required-documents-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\test-results\\e2e-onboarding-influencer--64a14-d-upload-required-documents-chromium\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Lenovo\\Desktop\\Workspce\\vo-onelink-google\\tests\\e2e\\onboarding-influencer.spec.ts",
+                        "column": 59,
+                        "line": 24
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "aa10e662764f259b2673-b8dcc3c511dc874c762b",
+              "file": "e2e/onboarding-influencer.spec.ts",
+              "line": 17,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-21T10:36:21.801Z",
+    "duration": 8246.777,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

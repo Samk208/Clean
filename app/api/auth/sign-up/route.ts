@@ -97,13 +97,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const message = authError.message || 'Unable to create account'
       const isDuplicate = message.toLowerCase().includes('already') || message.toLowerCase().includes('registered')
       const status = isDuplicate ? 409 : 400
-      return NextResponse.json(
-        {
-          ...createAuthErrorResponse(`Unable to create account: ${message}`),
-          ...(process.env.NODE_ENV === 'development' ? { debug: { code: (authError as any).code, details: (authError as any).error_description || (authError as any).message } } : {}),
-        },
-        { status }
-      )
+
+      // Merge debug info explicitly to avoid clobbering
+      type DebuggableAuthResponse = ReturnType<typeof createAuthErrorResponse> & { debug?: Record<string, unknown> }
+      const baseResponse: DebuggableAuthResponse = createAuthErrorResponse(`Unable to create account: ${message}`)
+      if (process.env.NODE_ENV === 'development') {
+        baseResponse.debug = {
+          ...(baseResponse.debug || {}),
+          code: (authError as { code?: unknown }).code,
+          details: (authError as { error_description?: unknown; message?: unknown }).error_description || authError.message,
+        }
+      }
+      return NextResponse.json(baseResponse, { status })
     }
 
     if (!authData.user) {
@@ -145,11 +150,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       createAuthSuccessResponse(user, "Account created successfully! ")
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Unexpected sign-up error:', error)
-    const body: any = createAuthErrorResponse("Something went wrong. Please try again.")
+    type DebuggableAuthResponse = ReturnType<typeof createAuthErrorResponse> & { debug?: Record<string, unknown> }
+    const body: DebuggableAuthResponse = createAuthErrorResponse("Something went wrong. Please try again.")
     if (process.env.NODE_ENV === 'development') {
-      body.debug = { message: String(error?.message || error) }
+      let message: string
+      if (error instanceof Error) {
+        message = error.message
+      } else {
+        message = String(error)
+      }
+      body.debug = { ...(body.debug || {}), message }
     }
     return NextResponse.json(body, { status: 500 })
   }

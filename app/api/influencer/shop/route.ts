@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
         in_stock
       `)
       .eq('active', true)
-      .eq('in_stock', true)
+      .or('in_stock.eq.true,stock_count.gt.0')
 
     // Apply filters
     if (category && category !== 'all') {

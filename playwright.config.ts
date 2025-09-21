@@ -12,7 +12,7 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
   ],
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://127.0.0.1:3001',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'off',
@@ -24,12 +24,12 @@ export default defineConfig({
     },
   ],
   globalSetup: './tests/setup/global-setup.ts',
-  // Run tests against dev server to avoid requiring a production build
-  // This helps when the project has a build issue but we still want to validate flows
+  // Run tests against a dedicated dev server port to avoid EADDRINUSE when a local dev server is already running.
+  // We choose 3001 here to minimize collisions with manual local runs on 3000.
   webServer: {
-    command: 'pnpm dev --port 3000',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    command: 'pnpm dev --port 3001',
+    url: 'http://127.0.0.1:3001',
+    reuseExistingServer: true,
     timeout: 120_000,
   },
 })
