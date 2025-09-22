@@ -214,6 +214,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, disabled = false }: CartIt
           src={!imageError && item.image ? item.image : "/placeholder.svg"}
           alt={item.title}
           fill
+          sizes="64px"
           className="object-cover"
           onError={() => setImageError(true)}
         />

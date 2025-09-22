@@ -42,6 +42,7 @@ export async function middleware(req: NextRequest) {
     '/api/products', // Public product listing
     '/api/shop', // Public influencer shop data for SSR
     '/api/debug', // Local diagnostic endpoints
+    '/api/stripe', // Stripe diagnostics and other public Stripe endpoints
     '/api/checkout', // Allow checkout endpoint to return JSON (route enforces auth/roles itself)
     '/api/webhooks/stripe', // Stripe webhooks must be publicly accessible (secured by signature)
   ]

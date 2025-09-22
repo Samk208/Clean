@@ -84,29 +84,47 @@ export const updateCartItemSchema = z.object({
 })
 
 export const checkoutSchema = z.object({
-  items: z.array(z.object({
-    productId: z.string().uuid(),
-    quantity: z.number().int().min(1),
-    // Optional influencer/referral context (additive)
-    influencerId: z.string().uuid().optional(),
-    shopHandle: z.string().min(1).optional(),
-    effectivePrice: z.number().min(0).optional(),
-    price: z.number().min(0).optional(),
-  })).min(1),
-  shippingAddress: z.object({
-    street: z.string().min(1),
-    city: z.string().min(1),
-    state: z.string().min(1),
-    zipCode: z.string().min(1),
-    country: z.string().min(1),
-  }),
-  billingAddress: z.object({
-    street: z.string().min(1),
-    city: z.string().min(1),
-    state: z.string().min(1),
-    zipCode: z.string().min(1),
-    country: z.string().min(1),
-  }),
+  items: z
+    .array(
+      z.object({
+        // Accept any non-empty string; some demo data uses non-UUID IDs
+        productId: z.string().min(1),
+        quantity: z.number().int().min(1),
+        // Optional influencer/referral context (additive)
+        influencerId: z.string().min(1).optional(),
+        shopHandle: z.string().min(1).optional(),
+        effectivePrice: z.number().min(0).optional(),
+        price: z.number().min(0).optional(),
+      })
+    )
+    .min(1),
+  // Support both 'street' and 'address' shapes from different clients
+  shippingAddress: z
+    .object({
+      street: z.string().min(1).optional(),
+      address: z.string().min(1).optional(),
+      city: z.string().min(1),
+      state: z.string().min(1),
+      zipCode: z.string().min(1),
+      country: z.string().min(1),
+    })
+    .refine((d) => Boolean(d.street || d.address), {
+      message: "Provide street or address",
+      path: ["street"],
+    }),
+  billingAddress: z
+    .object({
+      street: z.string().min(1).optional(),
+      address: z.string().min(1).optional(),
+      city: z.string().min(1),
+      state: z.string().min(1),
+      zipCode: z.string().min(1),
+      country: z.string().min(1),
+    })
+    .refine((d) => Boolean(d.street || d.address), {
+      message: "Provide street or address",
+      path: ["street"],
+    }),
 })
 
 // Shop validation

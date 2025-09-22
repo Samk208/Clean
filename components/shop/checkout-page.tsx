@@ -454,6 +454,7 @@ export function CheckoutPage() {
                           src={item.image || "/placeholder.svg"}
                           alt={item.title}
                           fill
+                          sizes="48px"
                           className="object-cover"
                         />
                         <Badge className="absolute -top-1 -right-1 bg-indigo-600 text-white min-w-[18px] h-4 rounded-full text-xs flex items-center justify-center">
