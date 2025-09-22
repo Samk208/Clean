@@ -1,5 +1,0 @@
-
-lib\supabase\admin.ts:13:export const supabaseAdmin = createClient<Database>(
-lib\supabase\server.ts:16:    return createServerClient<Database>(
-lib\supabase\server.ts:36:  return createServerClient<Database>(
-
